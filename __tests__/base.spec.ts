@@ -1,24 +1,29 @@
 import *  as puppeteer from "puppeteer";
-import { sampleFunction } from "../src/sampleFunction";
+
+jest.setTimeout(10000);
 
 describe("This is a simple test", () => {
 
-  test("Check the sampleFunction function", () => {
+//   test("Check the sampleFunction function", () => {
 
-    expect(sampleFunction("hello")).toEqual("hellohello");
-    console.log('When hello is input we get ' + sampleFunction("hello"));
+//     expect(sampleFunction("hello")).toEqual("hellohello");
+//     console.log('When hello is input we get ' + sampleFunction("hello"));
 
-  });
+//   });
 
-
-test("This is a non headless TS BBC browser test", () => {
-    async function run () {
-        const browser = await puppeteer.launch();
+  test("headless TS browser opens with page", async () => {
+        const browser = await puppeteer.launch({headless: false});
         const page = await browser.newPage();
-        await page.goto('https://www.bbc.co.uk/sounds');
-        await page.screenshot({path: 'BBCscreenshot.png'});
+        await page.goto('http://www.nhm.ac.uk/');
+        let returl = await page.url()
+          expect(returl).toMatch('http://www.nhm.ac.uk');
+        await page.screenshot({path: 'NHMscreenshot.png'});
         browser.close();
-    }
-    run();
-    });
+
+        process.on('unhandledRejection', (reason, promise) => {
+          console.log('Unhandled Rejection at:', reason.stack || reason)
+          // Recommended: send the information to sentry.io
+          // or whatever crash reporting service you use
+        })
+  });
 });

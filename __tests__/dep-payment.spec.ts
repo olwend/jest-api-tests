@@ -1,5 +1,4 @@
 import * as request from "request"; 
-// import * as puppeteer from "jest-environment-puppeteer";
 import * as puppeteer from "puppeteer"
 
 // create env file
@@ -131,12 +130,20 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
             });
     });
 
-    test("This is a non headless TS BBC browser test", () => {
+    test("redirect to browser paymentAuthorizationUri", () => {
+    
+        console.log('Browser opened with' + paymentAuthorizationUri)
+    
     async function run () {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({headless: false, slowMo: 1000});
         const page = await browser.newPage();
-        await page.goto('https://www.bbc.co.uk/sounds');
-        await page.screenshot({path: 'BBCscreenshot.png'});
+        await page.goto(paymentAuthorizationUri);
+        {
+                waitUntil: 'domcontentloaded'
+            };
+        page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+        await page.evaluate(() => console.log(`url is ${location.href}`));
+        console.log('Browser opened with ' + paymentAuthorizationUri);
         browser.close();
     }
     run();
