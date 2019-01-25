@@ -1,9 +1,10 @@
 import * as request from "request"; 
 import * as puppeteer from "puppeteer"
+import { SSL_OP_EPHEMERAL_RSA } from "constants";
 
 // create env file
 
-jest.setTimeout(15000);
+jest.setTimeout(25000);
 
 
 describe("This is a test of the Merchant Payment API to payment created", () => {
@@ -130,22 +131,24 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
             });
     });
 
-    test("redirect to browser paymentAuthorizationUri", () => {
-    
-        console.log('Browser opened with' + paymentAuthorizationUri)
-    
-    async function run () {
-        const browser = await puppeteer.launch({headless: false, slowMo: 1000});
+    test("headless TS browser opens with paymentAuthorizationUri", async () => {
+        const browser = await puppeteer.launch({headless: true});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
-        {
-                waitUntil: 'domcontentloaded'
-            };
-        page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-        await page.evaluate(() => console.log(`url is ${location.href}`));
-        console.log('Browser opened with ' + paymentAuthorizationUri);
+        await page.waitFor(20000);
+        let returl = await page.url()
+          expect(returl).toMatch(paymentAuthorizationUri);
+        await page.screenshot({path: 'VBG.png'});
+        console.log('Reached ' + paymentAuthorizationUri);
+        await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
+        expect(page).toContain('ForgeRock');
         browser.close();
-    }
-    run();
-    });
+
+        process.on('unhandledRejection', (reason, promise) => {
+          console.log('Unhandled Rejection at:', reason.stack || reason)
+          // Recommended: send the information to sentry.io
+          // or whatever crash reporting service you use
+        })
+  });
 });
+

@@ -5,5 +5,11 @@ module.exports = {
     testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
     testPathIgnorePatterns: ["dep"],
-    testResultsProcessor: "./node_modules/jest-html-reporter"
+    "setupTestFrameworkScriptFile": "expect-puppeteer",
+    "reporters": [
+      "default",
+      ["./node_modules/jest-html-reporter", {
+          "pageTitle": "Payment flow test report"
+      }]
+  ]
 }
