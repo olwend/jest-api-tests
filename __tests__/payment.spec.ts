@@ -1,13 +1,13 @@
 import * as request from "request"; 
-import * as puppeteer from "puppeteer"
-import { SSL_OP_EPHEMERAL_RSA } from "constants";
+import * as puppeteer from "puppeteer";
+import * as expectPuppeteer from "puppeteer";
 
 // create env file
 
-jest.setTimeout(25000);
+jest.setTimeout(45000);
 
 
-describe("This is a test of the Merchant Payment API to payment created", () => {
+describe("This is a test of the Merchant Payment API to payment Authorized", () => {
 
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
@@ -87,7 +87,6 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
                 response.on('end', () => {
                     console.log(data)
                     let dt = JSON.parse(data);
-                    console.log(dt.data.paymentAuthorizationUri);
                     paymentToken = dt.data.paymentToken;
                     paymentAuthorizationUri = dt.data.paymentAuthorizationUri;
                     expect(paymentAuthorizationUri).not.toBeUndefined();
@@ -104,8 +103,7 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
         getStatusLink = paymentEndPoint.concat(paymentToken);
         console.log(getStatusLink);
         const authHeader = `Bearer ${accessToken}`;
-        console.log('Get auth ' + authHeader);
-
+   
         request
             .get(getStatusLink,
                 {
@@ -131,17 +129,45 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
             });
     });
 
-    test("headless TS browser opens with paymentAuthorizationUri", async () => {
-        const browser = await puppeteer.launch({headless: true});
+    test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
+        const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
-        await page.waitFor(20000);
+        await page.waitFor(10000);
         let returl = await page.url()
           expect(returl).toMatch(paymentAuthorizationUri);
-        await page.screenshot({path: 'VBG.png'});
+        await page.screenshot({path: 'SVBG.png',fullPage: true });
         console.log('Reached ' + paymentAuthorizationUri);
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
-        expect(page).toContain('ForgeRock');
+        console.log('Moved through to Forge Rock')
+        await page.waitFor(10000);
+        let FRurl = await page.url();
+            expect(FRurl).toContain('https://auth.ob.forgerock.financial');
+      
+        await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
+        await expect(page).toFill('#mat-input-1', 'V1bePayTester');
+        await page.screenshot({path: 'SFRlogin.png',fullPage: true });
+        await expect(page).toClick('button', { text: 'Sign in' });
+        console.log('vibefeature user is logged in');
+        await page.waitFor(10000);
+
+        await expect(page).toClick('#mat-radio-4');
+        await expect(page).toClick('button', { text: 'Allow'});
+        console.log('account selected');
+        await page.screenshot({path: 'SAcctSelected.png',fullPage: true });
+
+        await page.waitFor(5000);
+        let VBGurl = await page.url();
+        expect(VBGurl).toContain('https://banking-gateway.sandbox.vibepay.com/success');   
+        console.log('VBG Thankyou success splash');
+        await page.waitFor(5000);
+        let Murl = await page.url();
+        expect(Murl).toContain('https://merchant.sandbox.vibepay.com/Payment');  
+ 
+        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
+        await expect(textContent).toContain('Payment Details');
+        await page.screenshot({path: 'SPaymentDetails.png',fullPage: true });
+        console.log('Merchant payment details page');
         browser.close();
 
         process.on('unhandledRejection', (reason, promise) => {
@@ -150,5 +176,38 @@ describe("This is a test of the Merchant Payment API to payment created", () => 
           // or whatever crash reporting service you use
         })
   });
+
+  test("payment status is Authorized", async done => {
+
+    getStatusLink = paymentEndPoint.concat(paymentToken);
+
+    const authHeader = `Bearer ${accessToken}`;
+
+    request
+        .get(getStatusLink,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader
+                },
+            })
+        .on('response', (response) => {
+            expect(response.statusCode).toBe(200);
+            let data: any = '';
+            response.on('data', _data => (data += _data));
+            response.on('end', () => {
+                const dt = JSON.parse(data);
+                status = dt.data.status;
+                expect(status).toBe('Authorized');
+                console.log('Payment status is ' + status)
+            });
+
+            done();
+
+        });
+});
+
+
 });
 
