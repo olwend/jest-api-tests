@@ -133,7 +133,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
-        await page.waitFor(10000);
+        await page.waitFor(6750);
         let returl = await page.url()
           expect(returl).toMatch(paymentAuthorizationUri);
         
@@ -141,7 +141,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         console.log('Reached ' + paymentAuthorizationUri);
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
-        await page.waitFor(10000);
+        await page.waitFor(6750);
         let FRurl = await page.url();
             expect(FRurl).toContain('https://auth.ob.forgerock.financial');
       
@@ -150,7 +150,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         await page.screenshot({path:'./screenshot/SFRlogin.png',fullPage: true });
         await expect(page).toClick('button', { text: 'Sign in' });
         console.log('vibefeature user is logged in');
-        await page.waitFor(10000);
+        await page.waitFor(6750);
 
         await expect(page).toClick('#mat-radio-4');
         await expect(page).toClick('button', { text: 'Allow'});
