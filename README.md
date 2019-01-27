@@ -4,9 +4,10 @@ E2E flow:
 
 
 # Dependencies
+See https://medium.com/@assertis/creating-a-scraper-using-headless-chrome-ecbe4ade9f86 for installation 
 * Jest test runner 
 * Chromium Puppeteer headless environment
-* Typescript 
+* Typescript - @types/puppeteer, @types/jest ts-jest, @types/expect-puppeteer and associated npm packages
 * Node version >= 8.7.0
 * npm >= 5.6.0
 

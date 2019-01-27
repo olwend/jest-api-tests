@@ -7,7 +7,7 @@ import * as expectPuppeteer from "puppeteer";
 jest.setTimeout(45000);
 
 
-describe("This is a test of the Merchant Payment API to payment Authorized", () => {
+describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
@@ -69,8 +69,8 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
             .post('https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments',
                 {
                     body: JSON.stringify({
-                        "amount": "1700.00",
-                        "transactionId": "120000000000017",
+                        "amount": "2700.00",
+                        "transactionId": "12000000000002",
                         "unstructured": "4321",
                         "reference": "3414"
                     }),
@@ -136,8 +136,8 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         await page.waitFor(10000);
         let returl = await page.url()
           expect(returl).toMatch(paymentAuthorizationUri);
-        
         await page.screenshot({path:'./screenshot/SVBG.png',fullPage: true });
+      
         console.log('Reached ' + paymentAuthorizationUri);
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
