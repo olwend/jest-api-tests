@@ -59,7 +59,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("create payment and save paymentAuthorizationUri", async done => {
         // let paymentAuthorizationUri = '';
         const authHeader = `Bearer ${accessToken}`;
@@ -97,7 +97,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
             });
 
     });
-
+// per payment
     test("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
@@ -128,7 +128,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
         const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
@@ -177,7 +177,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
           // or whatever crash reporting service you use
         })
   });
-
+// per payment
   test("payment status is Authorized", async done => {
 
     getStatusLink = paymentEndPoint.concat(paymentToken);

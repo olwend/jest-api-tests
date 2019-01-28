@@ -8,15 +8,16 @@ jest.setTimeout(45000);
 
 
 describe("This is a test of the Merchant Payment API to payment Authorized", () => {
-
+// opens up merchant -> API communication
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
+    // let paymentEndPoint = 'https://api.banking-gateway.test.vibepay.com/api/v1.0/payments/';
     let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
     let status = '';
 
-    test("Check the api.jigpay version", async done => {
+    test("Check the api.banking-gateway version", async done => {
 
         request
             .get('https://dev.api.jigpay.co.uk/api/version')
@@ -34,7 +35,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
     test("get token", async done => {
 
         request
-            .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
+           .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
                 {
                     form: {
                         grant_type: 'client_credentials',
@@ -130,7 +131,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
     });
 
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
-        const browser = await puppeteer.launch({headless:true});
+        const browser = await puppeteer.launch({headless:false});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
         await page.waitFor(6750);
@@ -138,7 +139,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
           expect(returl).toMatch(paymentAuthorizationUri);
         
         await page.screenshot({path:'./screenshot/SVBG.png',fullPage: true });
-        console.log('Reached ' + paymentAuthorizationUri);
+        console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
         await page.waitFor(6750);
@@ -150,9 +151,34 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         await page.screenshot({path:'./screenshot/SFRlogin.png',fullPage: true });
         await expect(page).toClick('button', { text: 'Sign in' });
         console.log('vibefeature user is logged in');
-        await page.waitFor(6750);
+        getStatusLink = paymentEndPoint.concat(paymentToken);
 
-        await expect(page).toClick('#mat-radio-4');
+        const authHeader = `Bearer ${accessToken}`;
+
+        request
+            .get(getStatusLink,
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader
+                    },
+                })
+            .on('response', (response) => {
+                expect(response.statusCode).toBe(200);
+                let data: any = '';
+                response.on('data', _data => (data += _data));
+                response.on('end', () => {
+                    const dt = JSON.parse(data);
+                    status = dt.data.status;
+                    expect(status).toBe('AuthorizationStarted');
+                    console.log('Payment status is ' + status)
+                });
+
+            });
+        await page.waitFor(6750);
+// Use FR Bills EUR account
+        await expect(page).toClick('#mat-radio-3');
         await expect(page).toClick('button', { text: 'Allow'});
         console.log('account selected');
         await page.screenshot({path:'./screenshot/SAcctSelected.png',fullPage: true });
@@ -178,37 +204,82 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         })
   });
 
-  test("payment status is Authorized", async done => {
 
-    getStatusLink = paymentEndPoint.concat(paymentToken);
+ // add timeout function and check for completed within xxxs
+    test("payment status is Authorized", async done => {
 
-    const authHeader = `Bearer ${accessToken}`;
+        getStatusLink = paymentEndPoint.concat(paymentToken);
 
-    request
-        .get(getStatusLink,
-            {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': authHeader
-                },
-            })
-        .on('response', (response) => {
-            expect(response.statusCode).toBe(200);
-            let data: any = '';
-            response.on('data', _data => (data += _data));
-            response.on('end', () => {
-                const dt = JSON.parse(data);
-                status = dt.data.status;
-                expect(status).toBe('Authorized');
-                console.log('Payment status is ' + status)
+        const authHeader = `Bearer ${accessToken}`;
+       
+        request
+            .get(getStatusLink,
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader
+                    },
+                })
+            .on('response', (response) => {
+                expect(response.statusCode).toBe(200);
+                let data: any = '';
+                response.on('data', _data => (data += _data));
+                response.on('end', () => {
+                    const dt = JSON.parse(data);
+                    status = dt.data.status;
+                    expect(status).toBe('Authorized');
+                    console.log('Payment status is ' + status)
+                });
+
+                done();
+
             });
+    });
 
+    
+    // test('Google Homepage', () => {
+    //     let gpage;
+    //     test('has title "Google"', async () => {
+    //     await gpage.goto('https://google.com', { waitUntil: 'networkidle0' })
+    //     const title = await gpage.title()
+    //     expect(title).toBe('Google')
+    //     await gpage.waitFor(30000);
+    //     })
+    // });
+
+
+    test("payment status is Completed", async done => {
+        const browser = await puppeteer.launch({headless:false});
+        const page = await browser.newPage();
+        await page.waitFor(30001);
+        getStatusLink = paymentEndPoint.concat(paymentToken);
+    
+        const authHeader = `Bearer ${accessToken}`;
+    
+        request
+            .get(getStatusLink,
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader
+                    },
+                })
+            .on('response', (response) => {
+                expect(response.statusCode).toBe(200);
+                let data: any = '';
+                response.on('data', _data => (data += _data));
+                response.on('end', () => {
+                    const dt = JSON.parse(data);
+                    status = dt.data.status;
+                    expect(status).toBe('Completed');
+                    console.log('Payment status is ' + status)
+                });
+            browser.close();
             done();
+    
+            });
+    });
 
-        });
 });
-
-
-});
-
