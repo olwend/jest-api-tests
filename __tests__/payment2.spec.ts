@@ -59,7 +59,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("create payment and save paymentAuthorizationUri", async done => {
         // let paymentAuthorizationUri = '';
         const authHeader = `Bearer ${accessToken}`;
@@ -97,7 +97,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
             });
 
     });
-
+// per payment
     test("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
@@ -128,7 +128,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
         const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
@@ -138,7 +138,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
           expect(returl).toMatch(paymentAuthorizationUri);
         await page.screenshot({path:'./screenshot/SVBG.png',fullPage: true });
       
-        console.log('Reached ' + paymentAuthorizationUri);
+        console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
         await page.waitFor(6750);
@@ -177,7 +177,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
           // or whatever crash reporting service you use
         })
   });
-
+// per payment
   test("payment status is Authorized", async done => {
 
     getStatusLink = paymentEndPoint.concat(paymentToken);
@@ -209,6 +209,38 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
         });
 });
 
+test("payment status is Completed", async done => {
+    const browser = await puppeteer.launch({headless:false});
+    const page = await browser.newPage();
+    await page.waitFor(30025);
+    getStatusLink = paymentEndPoint.concat(paymentToken);
+
+    const authHeader = `Bearer ${accessToken}`;
+
+    request
+        .get(getStatusLink,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader
+                },
+            })
+        .on('response', (response) => {
+            expect(response.statusCode).toBe(200);
+            let data: any = '';
+            response.on('data', _data => (data += _data));
+            response.on('end', () => {
+                const dt = JSON.parse(data);
+                status = dt.data.status;
+                expect(status).toBe('Completed');
+                console.log('Payment status is ' + status)
+            });
+        browser.close();
+        done();
+
+        });
+    });
 
 });
 
