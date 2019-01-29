@@ -6,14 +6,23 @@ import * as puppeteer from "puppeteer";
 jest.setTimeout(45000);
 
 describe("This is a test of the Merchant Payment API to payment Authorized", () => {
+<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
     // opens up merchant -> API communication
+=======
+// opens up merchant -> API communication
+>>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
+<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
     let paymentEndPoint = 'https://api.banking-gateway.dev.vibepay.com/api/v1.0/payments/';
     // let paymentEndPoint = 'https://api.banking-gateway.test.vibepay.com/api/v1.0/payments/';
     // let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
+=======
+    // let paymentEndPoint = 'https://api.banking-gateway.test.vibepay.com/api/v1.0/payments/';
+    let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
+>>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
     let status = '';
 
     test("Check the api.banking-gateway version", async done => {
@@ -34,9 +43,13 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
     test("get token", async done => {
 
         request
+<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
             .post('https://api.banking-gateway.dev.vibepay.com/connect/token',
             // .post('https://api.banking-gateway.test.vibepay.com/connect/token',
             // .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
+=======
+           .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
+>>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
                 {
                     form: {
                         grant_type: 'client_credentials',
@@ -135,7 +148,8 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
 
     // per payment
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
-        const browser = await puppeteer.launch({ headless: true});
+
+        const browser = await puppeteer.launch({headless:false});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
         await page.waitFor(6750);
@@ -143,6 +157,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         expect(returl).toMatch(paymentAuthorizationUri);
 
         await page.screenshot({ path: './screenshot/SVBG.png', fullPage: true });
+
         console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
@@ -181,6 +196,7 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
 
             });
         await page.waitFor(6750);
+
         // Use FR Bills EUR account
         await expect(page).toClick('#mat-radio-3');
         await expect(page).toClick('button', { text: 'Allow' });
@@ -208,14 +224,13 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
         })
     });
 
-
     //per payment
+
     test("payment status is Authorized", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
 
         const authHeader = `Bearer ${accessToken}`;
-
         request
             .get(getStatusLink,
                 {
