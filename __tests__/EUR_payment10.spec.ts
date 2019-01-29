@@ -1,6 +1,5 @@
 import * as request from "request"; 
 import * as puppeteer from "puppeteer";
-import * as expectPuppeteer from "puppeteer";
 
 // create env file
 
@@ -151,7 +150,7 @@ describe("Test 10 of the Merchant Payment API to payment Authorized", () => {
         console.log('vibefeature user is logged in');
         await page.waitFor(6750);
 
-        await expect(page).toClick('#mat-radio-4');
+        await expect(page).toClick('#mat-radio-3');
         await expect(page).toClick('button', { text: 'Allow'});
         console.log('account selected');
         await page.screenshot({path:'./screenshot/SAcctSelected.png',fullPage: true });
@@ -208,6 +207,39 @@ describe("Test 10 of the Merchant Payment API to payment Authorized", () => {
         });
 });
 
+test("payment status is Completed", async done => {
+    const browser = await puppeteer.launch({headless:true});
+    const page = await browser.newPage();
+    await page.waitFor(35000);
+    getStatusLink = paymentEndPoint.concat(paymentToken);
+
+    const authHeader = `Bearer ${accessToken}`;
+
+    request
+        .get(getStatusLink,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader
+                },
+            })
+        .on('response', (response) => {
+            expect(response.statusCode).toBe(200);
+            let data: any = '';
+            response.on('data', _data => (data += _data));
+            response.on('end', () => {
+                const dt = JSON.parse(data);
+                status = dt.data.status;
+                expect(status).toBe('Completed');
+                console.log('Payment status is ' + status)
+            });
+        browser.close();
+        done();
+
+        });
+    });
 
 });
+
 

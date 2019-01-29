@@ -210,9 +210,9 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 });
 
 test("payment status is Completed", async done => {
-    const browser = await puppeteer.launch({headless:false});
+    const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();
-    await page.waitFor(30025);
+    await page.waitFor(35000);
     getStatusLink = paymentEndPoint.concat(paymentToken);
 
     const authHeader = `Bearer ${accessToken}`;

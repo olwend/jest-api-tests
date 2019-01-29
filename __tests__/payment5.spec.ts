@@ -158,11 +158,11 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
         await page.waitFor(5000);
         let VBGurl = await page.url();
-        expect(VBGurl).toContain('https://banking-gateway.sandbox.vibepay.com/success');   
+        expect(VBGurl).toContain('success');   
         console.log('VBG Thankyou success splash');
         await page.waitFor(5000);
         let Murl = await page.url();
-        expect(Murl).toContain('https://merchant.sandbox.vibepay.com/Payment');  
+        expect(Murl).toContain('Payment');  
  
         let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
         await expect(textContent).toContain('Payment Details');
@@ -207,7 +207,38 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
         });
 });
+test("payment status is Completed", async done => {
+    const browser = await puppeteer.launch({headless:true});
+    const page = await browser.newPage();
+    await page.waitFor(32500);
+    getStatusLink = paymentEndPoint.concat(paymentToken);
 
+    const authHeader = `Bearer ${accessToken}`;
+
+    request
+        .get(getStatusLink,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader
+                },
+            })
+        .on('response', (response) => {
+            expect(response.statusCode).toBe(200);
+            let data: any = '';
+            response.on('data', _data => (data += _data));
+            response.on('end', () => {
+                const dt = JSON.parse(data);
+                status = dt.data.status;
+                expect(status).toBe('Completed');
+                console.log('Payment status is ' + status)
+            });
+        browser.close();
+        done();
+
+        });
+    });
 
 });
 
