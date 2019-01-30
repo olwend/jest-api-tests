@@ -6,23 +6,14 @@ import * as puppeteer from "puppeteer";
 jest.setTimeout(45000);
 
 describe("This is a test of the Merchant Payment API to payment Authorized", () => {
-<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
-    // opens up merchant -> API communication
-=======
 // opens up merchant -> API communication
->>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
-<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
     let paymentEndPoint = 'https://api.banking-gateway.dev.vibepay.com/api/v1.0/payments/';
     // let paymentEndPoint = 'https://api.banking-gateway.test.vibepay.com/api/v1.0/payments/';
     // let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
-=======
-    // let paymentEndPoint = 'https://api.banking-gateway.test.vibepay.com/api/v1.0/payments/';
-    let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
->>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
     let status = '';
 
     test("Check the api.banking-gateway version", async done => {
@@ -43,13 +34,9 @@ describe("This is a test of the Merchant Payment API to payment Authorized", () 
     test("get token", async done => {
 
         request
-<<<<<<< HEAD:__tests__/DEV_payment.spec.ts
             .post('https://api.banking-gateway.dev.vibepay.com/connect/token',
             // .post('https://api.banking-gateway.test.vibepay.com/connect/token',
             // .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
-=======
-           .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
->>>>>>> 73a88f45499439e6564bffbed496d7a76007234b:__tests__/payment.spec.ts
                 {
                     form: {
                         grant_type: 'client_credentials',
