@@ -5,15 +5,16 @@ import * as expectPuppeteer from "puppeteer";
 // create env file
 
 jest.setTimeout(45000);
-debugger;
 
-describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
+
+describe("Test of the local merchant1-vibepay-api to payment Authorized", () => {
 
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
-    let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
+    let paymentEndPoint = 'http://0.0.0.0:5006/payments';
+    // let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
     let status = '';
 
     test("Check the api.jigpay version", async done => {
@@ -34,7 +35,8 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
     test("get token", async done => {
 
         request
-            .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
+            .post('http://0.0.0.0:5006/connect/token',
+            // .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
                 {
                     form: {
                         grant_type: 'client_credentials',
@@ -43,7 +45,7 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': 'Basic ZmFrZS1tZXJjaGFudDpzZWNyZXQ='
+                        'Authorization': 'Basic bWVyY2hhbnQxLXZpYmVwYXktYXBpOnNlY3JldA=='
                     },
                 })
             .on('response', (response) => {
@@ -59,18 +61,18 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("create payment and save paymentAuthorizationUri", async done => {
         // let paymentAuthorizationUri = '';
         const authHeader = `Bearer ${accessToken}`;
         console.log('This is Auth Header ........' + authHeader);
         console.log('Getting payment details .......')
         request
-            .post('https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments',
+            .post('http://0.0.0.0:5006/api/v1.0/payments',
                 {
                     body: JSON.stringify({
-                        "amount": "3700.00",
-                        "transactionId": "120000000000037",
+                        "amount": "2700.00",
+                        "transactionId": "12000000000002",
                         "unstructured": "4321",
                         "reference": "3414"
                     }),
@@ -97,8 +99,8 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
             });
 
     });
-
-    test("get payment status", async done => {
+// per payment
+    xtest("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
         console.log(getStatusLink);
@@ -128,16 +130,17 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
             });
     });
-
+// per payment
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
-        const browser = await puppeteer.launch({headless:false});
+        const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
         await page.waitFor(6750);
         let returl = await page.url()
           expect(returl).toMatch(paymentAuthorizationUri);
         await page.screenshot({path:'./screenshot/SVBG.png',fullPage: true });
-        console.log('Reached ' + paymentAuthorizationUri);
+      
+        console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
         await page.waitFor(6750);
@@ -176,8 +179,8 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
           // or whatever crash reporting service you use
         })
   });
-
-  test("payment status is Authorized", async done => {
+// per payment
+  xtest("payment status is Authorized", async done => {
 
     getStatusLink = paymentEndPoint.concat(paymentToken);
 
@@ -207,7 +210,8 @@ describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
         });
 });
-test("payment status is Completed", async done => {
+
+xtest("payment status is Completed", async done => {
     const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();
     await page.waitFor(40000);
