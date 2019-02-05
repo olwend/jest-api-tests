@@ -4,7 +4,7 @@ import * as expectPuppeteer from "puppeteer";
 
 // create env file
 
-jest.setTimeout(45000);
+jest.setTimeout(55000);
 
 
 describe("Test2 of the Merchant Payment API to payment Authorized", () => {
@@ -212,7 +212,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 test("payment status is Completed", async done => {
     const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();
-    await page.waitFor(40000);
+    await page.waitFor(50000);
     getStatusLink = paymentEndPoint.concat(paymentToken);
 
     const authHeader = `Bearer ${accessToken}`;

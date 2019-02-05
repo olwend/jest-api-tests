@@ -13,7 +13,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
-    let paymentEndPoint = 'http://0.0.0.0:5006/api/v1.0/payments/';
+    let paymentEndPoint = 'http://localhost:5006/api/v1.0/payments/';
     // let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
     let status = '';
 
@@ -46,6 +46,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Authorization': 'Basic bWVyY2hhbnQxLXZpYmVwYXktYXBpOnNlY3JldA=='
+                        // 'Authorization': 'Basic ZmFrZS1tZXJjaGFudDpzZWNyZXQ='
                     },
                 })
             .on('response', (response) => {
@@ -100,7 +101,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
     });
 // per payment
-    xtest("get payment status", async done => {
+    test("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
         console.log(getStatusLink);
@@ -131,8 +132,8 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
             });
     });
 // per payment
-    xtest("progress pAuthUri through bank to allow payment then back to merchant", async () => {
-        const browser = await puppeteer.launch({headless:true});
+    test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
+        const browser = await puppeteer.launch({headless:false});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
         await page.waitFor(6750);
@@ -161,6 +162,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
         await page.waitFor(5000);
         let VBGurl = await page.url();
+        await page.screenshot({path:'./screenshot/paymentAuth.png',fullPage: true });
         expect(VBGurl).toContain('success');   
         console.log('VBG Thankyou success splash');
         await page.waitFor(5000);
