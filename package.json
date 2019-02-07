@@ -16,10 +16,13 @@
     "@types/request": "^2.48.1",
     "dotenv": "^6.2.0",
     "expect-puppeteer": "^3.5.1",
+    "i": "^0.3.6",
     "jest": "^23.6.0",
     "jest-html-reporter": "^2.4.3",
+    "npm": "^6.7.0",
     "puppeteer": "^1.11.0",
     "ts-node": "^8.0.1",
+    "ts-retry-promise": "^0.2.0",
     "typescript": "^3.2.4"
   },
   "devDependencies": {

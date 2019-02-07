@@ -4,6 +4,7 @@ import * as expectPuppeteer from "puppeteer";
 import { AuthCodeFactory } from "./common/auth-code.factory";
 import { ResponseHelper } from "./common/response-helper";
 import { HeadersHelper } from "./common/headers.factory";
+import { retry } from "ts-retry-promise"
 
 jest.setTimeout(45000);
 
@@ -21,10 +22,10 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     let accessToken: string = '';
     let paymentAuthorizationUri: string = '';
     let paymentToken: string = '';
-    let getStatusLink: string = '';
-    let status: string = '';
-    //let apiUrlRoot: string = 'https://dev.api.banking-gateway.jigpay.co.uk';
-    // let apiUrlRoot: string = 'https://test.api.banking-gateway.jigpay.co.uk';
+    //let getStatusLink: string = '';
+    let page: puppeteer.Page = undefined;
+    let browser: puppeteer.Browser = undefined;
+
     let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
     let factory = new AuthCodeFactory('fake-merchant', 'secret');
     let creds = factory.create();
@@ -105,12 +106,119 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
             //generic response handler method
             .on('response', (response) => ResponseHelper.handleResponse(response).then(data => {
                 const dt = JSON.parse(data);
-                status = dt.data.status;
+                let status = dt.data.status;
                 expect(status).toBe('Created');
                 console.log('Payment status is ' + status)
                 done();
             }));
     });
 
+    test("progress to hosted payments page", async done => {
 
-})
+        // set up globals for use in rest of tests
+        browser = await puppeteer.launch({ headless: false });
+        page = await browser.newPage();
+
+        await page.goto(paymentAuthorizationUri);
+        await page.waitFor(6750);
+        let returl = await page.url()
+        expect(returl).toMatch(paymentAuthorizationUri);
+        await page.screenshot({ path: './screenshot/SVBG.png', fullPage: true });
+
+        done();
+    });
+
+    // this is provider specific
+    test("navigate to provider", async done => {
+        // TODO: provider 
+        console.log('Reached VBG payment link dashboard');
+        await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
+        console.log('Moved through to Forge Rock')
+        await page.waitFor(6750);
+        let FRurl = await page.url();
+        expect(FRurl).toContain('https://auth.ob.forgerock.financial');
+        done();
+    });
+
+
+    // this is provider specific
+    test("login on provider", async done => {
+        await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
+        await expect(page).toFill('#mat-input-1', 'V1bePayTester');
+        await page.screenshot({ path: './screenshot/SFRlogin.png', fullPage: true });
+        await expect(page).toClick('button', { text: 'Sign in' });
+        console.log('vibefeature user is logged in');
+        await page.waitFor(6750);
+        done();
+    });
+
+    // this is provider specific
+    test("select account on provider", async done => {
+        await expect(page).toClick('#mat-radio-4');
+        await expect(page).toClick('button', { text: 'Allow' });
+        console.log('account selected');
+        await page.screenshot({ path: './screenshot/SAcctSelected.png', fullPage: true });
+        await page.waitFor(6750);
+        done();
+    });
+
+    // this is provider specific
+    test("redirect back to hosted payments processing page", async done => {
+        let VBGurl = await page.url();
+        await page.screenshot({ path: './screenshot/paymentAuth.png', fullPage: true });
+        expect(VBGurl).toContain('success');
+        console.log('VBG Thankyou success splash');
+        await page.waitFor(5000);
+        let Murl = await page.url();
+        expect(Murl).toContain('Payment');
+        await page.waitFor(6750);
+        done();
+    });
+
+    // this is provider specific
+    test("redirect back to merchant", async done => {
+        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
+        //await expect(textContent).toContain('Payment Details');
+        await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
+        console.log('Merchant payment details page');
+        browser.close();
+    });
+
+    //         process.on('unhandledRejection', (reason, promise) => {
+    //             console.log('Unhandled Rejection at:', reason.stack || reason)
+    //             // Recommended: send the information to sentry.io
+    //             // or whatever crash reporting service you use
+    //         })
+
+
+    // per payment
+    test("retry untill we get payment status completed", async done => {
+
+        console.log('in retry bits');
+        // await retry(
+        //     () => new Promise<Array<string>>((resolve, reject) => { resolve(['', '']) }),
+        //     { until: (list) => list.length === 2 });
+        const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
+
+        await retry(
+            async () => {
+                console.log('retrying');
+                return new Promise<string>((res, reg) => {
+                    request
+                        .get(getStatusLink, { headers: HeadersHelper.createBearer(accessToken) })
+                        .on('response', (response) => ResponseHelper
+                            .handleResponse(response)
+                            .then(data => {
+                                const dt = JSON.parse(data);
+                                console.log('Payment status is ' + dt.data.status)
+                                res(dt.data.status);
+                            }));
+                });
+            },
+            { until: (s) => s === 'Completed' });
+
+        done();
+    });
+
+
+});
