@@ -5,16 +5,15 @@ import * as expectPuppeteer from "puppeteer";
 // create env file
 
 jest.setTimeout(45000);
+debugger;
 
-
-describe("Test of the local merchant1-vibepay-api to payment Authorized", () => {
+describe("Test 5 of the Merchant Payment API to payment Authorized", () => {
 
     let accessToken: string = '';
     let paymentAuthorizationUri = '';
     let paymentToken = '';
     let getStatusLink = '';
-    let paymentEndPoint = 'http://0.0.0.0:5006/api/v1.0/payments/';
-    // let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
+    let paymentEndPoint = 'https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments/';
     let status = '';
 
     test("Check the api.jigpay version", async done => {
@@ -35,8 +34,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     test("get token", async done => {
 
         request
-            .post('http://0.0.0.0:5006/connect/token',
-            // .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
+            .post('https://api.banking-gateway.sandbox.vibepay.com/connect/token',
                 {
                     form: {
                         grant_type: 'client_credentials',
@@ -45,7 +43,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': 'Basic bWVyY2hhbnQxMS12aWJlcGF5LWFwaTpzZWNyZXQ='
+                        'Authorization': 'Basic ZmFrZS1tZXJjaGFudDpzZWNyZXQ='
                     },
                 })
             .on('response', (response) => {
@@ -61,18 +59,18 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
             });
     });
-// per payment
+
     test("create payment and save paymentAuthorizationUri", async done => {
         // let paymentAuthorizationUri = '';
         const authHeader = `Bearer ${accessToken}`;
         console.log('This is Auth Header ........' + authHeader);
         console.log('Getting payment details .......')
         request
-            .post('http://0.0.0.0:5006/api/v1.0/payments',
+            .post('https://api.banking-gateway.sandbox.vibepay.com/api/v1.0/payments',
                 {
                     body: JSON.stringify({
-                        "amount": "2700.00",
-                        "transactionId": "12000000000002",
+                        "amount": "3700.00",
+                        "transactionId": "120000000000037",
                         "unstructured": "4321",
                         "reference": "3414"
                     }),
@@ -99,7 +97,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
             });
 
     });
-// per payment
+
     test("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
@@ -130,7 +128,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
             });
     });
-// per payment
+
     test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
         const browser = await puppeteer.launch({headless:false});
         const page = await browser.newPage();
@@ -139,8 +137,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         let returl = await page.url()
           expect(returl).toMatch(paymentAuthorizationUri);
         await page.screenshot({path:'./screenshot/SVBG.png',fullPage: true });
-      
-        console.log('Reached VBG payment link dashboard');
+        console.log('Reached ' + paymentAuthorizationUri);
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
         await page.waitFor(6750);
@@ -179,7 +176,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
           // or whatever crash reporting service you use
         })
   });
-// per payment
+
   test("payment status is Authorized", async done => {
 
     getStatusLink = paymentEndPoint.concat(paymentToken);
@@ -210,7 +207,6 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
         });
 });
-
 test("payment status is Completed", async done => {
     const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();

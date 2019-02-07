@@ -4,7 +4,7 @@ import * as expectPuppeteer from "puppeteer";
 
 // create env file
 
-jest.setTimeout(55000);
+jest.setTimeout(65000);
 
 
 describe("Test2 of the Merchant Payment API to payment Authorized", () => {
@@ -166,8 +166,8 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
         expect(Murl).toContain('https://merchant.sandbox.vibepay.com/Payment');  
  
         let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
-        await expect(textContent).toContain('Payment Details');
         await page.screenshot({path:'./screenshot/SPaymentDetails.png',fullPage: true });
+        await expect(textContent).toContain('Payment Details');
         console.log('Merchant payment details page');
         browser.close();
 
@@ -212,7 +212,7 @@ describe("Test2 of the Merchant Payment API to payment Authorized", () => {
 test("payment status is Completed", async done => {
     const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();
-    await page.waitFor(50000);
+    await page.waitFor(60000);
     getStatusLink = paymentEndPoint.concat(paymentToken);
 
     const authHeader = `Bearer ${accessToken}`;

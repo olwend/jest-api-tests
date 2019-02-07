@@ -100,7 +100,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
     });
 // per payment
-    xtest("get payment status", async done => {
+    test("get payment status", async done => {
 
         getStatusLink = paymentEndPoint.concat(paymentToken);
         console.log(getStatusLink);
@@ -131,7 +131,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
             });
     });
 // per payment
-    xtest("progress pAuthUri through bank to allow payment then back to merchant", async () => {
+    test("progress pAuthUri through bank to allow payment then back to merchant", async () => {
         const browser = await puppeteer.launch({headless:true});
         const page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
@@ -180,7 +180,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         })
   });
 // per payment
-  xtest("payment status is Authorized", async done => {
+  test("payment status is Authorized", async done => {
 
     getStatusLink = paymentEndPoint.concat(paymentToken);
 
@@ -211,7 +211,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         });
 });
 
-xtest("payment status is Completed", async done => {
+test("payment status is Completed", async done => {
     const browser = await puppeteer.launch({headless:true});
     const page = await browser.newPage();
     await page.waitFor(40000);
