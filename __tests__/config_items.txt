@@ -1,0 +1,71 @@
+CONFIGURATION ITEMS
+
+ENVIRONMENTS 
+apiUrlRoot:
+LOCAL http://0.0.0.0:5006/
+DEV 'https://api.banking-gateway.dev.vibepay.com/
+TEST 'https://api.banking-gateway.test.vibepay.com/
+SANDBOX 'https://api.banking-gateway.sandbox.vibepay.com/
+      
+
+version endpoint https://dev.api.jigpay.co.uk/api/version
+
+ACCESS TOKEN: 
+/connect/token
+
+PAYMENTS: 
+api/v1.0/payments/
+
+VERSION:
+/api/v1.0/version
+
+getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`
+
+PAYMENT MODEL: 
+                    body: JSON.stringify({
+                        "amount": "1700.00",
+                        "transactionId": "120000000000017",
+                        "unstructured": "4321",
+                        "reference": "3414"
+                    })
+
+HEADERS:
+
+post to get accessToken 
+headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Authorization':`Basic ${value}``
+},
+
+post for payment
+headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization':`Bearer ${value}`
+},
+
+
+** Work out how to loop through / script merchants **
+
+let factory = new AuthCodeFactory('fake-merchant', 'secret');
+let factory = new AuthCodeFactory('merchant1-vibepay-api', 'secret');
+ merchant1 increments to merchant50
+
+CONFIGURED CLIENTS - Idsrv.Config.cs
+vibepay-api
+local-vibepay-api
+test-vibepay-api
+uat-vibepay-api
+sandbox-vibepay-api
+local-vibetickets-api
+dev-vibetickets-api
+fake-merchant
+charities-trust
+
+appsettings.dev.json
+appsettings.local.json
+appsettings.minikube.json
+appsettings.sandbox.json
+appsettings.test.json
+appsettings.uat.json

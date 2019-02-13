@@ -6,7 +6,7 @@ import { ResponseHelper } from "./common/response-helper";
 import { HeadersHelper } from "./common/headers.factory";
 import { retry } from "ts-retry-promise"
 
-jest.setTimeout(45000);
+jest.setTimeout(60000);
 
 // helper/variables to switch environments
 
@@ -152,7 +152,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         done();
     });
 
-    // this is provider specific
+    // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
     test("select account on provider", async done => {
         await expect(page).toClick('#mat-radio-4');
         await expect(page).toClick('button', { text: 'Allow' });
