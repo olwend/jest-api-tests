@@ -6,16 +6,15 @@ import { ResponseHelper } from "./common/response-helper";
 import { HeadersHelper } from "./common/headers.factory";
 import { retry } from "ts-retry-promise"
 
-jest.setTimeout(60000);
+jest.setTimeout(70000);
 
 // helper/variables to switch environments
 
 // switch clients - for loop to increment name string
-
-// generic response handler
-// generate headers
-
+// add test.each data set for payments
 // set up test with variables
+// add error handling
+
 
 describe("Test of the local merchant1-vibepay-api to payment Authorized", () => {
 
@@ -24,7 +23,8 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     let paymentToken: string = '';
     let page: puppeteer.Page = undefined;
     let browser: puppeteer.Browser = undefined;
-
+    // let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
+    // let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
     let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
     let factory = new AuthCodeFactory('fake-merchant', 'secret');
     let creds = factory.create();
@@ -56,7 +56,6 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
                 .then(data => {
                     const dt = JSON.parse(data);
                     accessToken = dt.access_token;
-                    console.log(accessToken);
                     expect(accessToken).not.toBeNull();
                     done();
                 }));
@@ -117,23 +116,21 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         // set up globals for use in rest of tests
         browser = await puppeteer.launch({ headless: false });
         page = await browser.newPage();
-
         await page.goto(paymentAuthorizationUri);
-        await page.waitFor(6750);
+        await page.waitForSelector('h1');
         let returl = await page.url()
         expect(returl).toMatch(paymentAuthorizationUri);
+        console.log('Reached VBG payment link dashboard');
         await page.screenshot({ path: './screenshot/SVBG.png', fullPage: true });
-
         done();
     });
 
     // this is provider specific
     test("navigate to provider", async done => {
         // TODO: provider 
-        console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
-        await page.waitFor(6750);
+        await page.waitForSelector('#IDToken1');
         let FRurl = await page.url();
         expect(FRurl).toContain('https://auth.ob.forgerock.financial');
         done();
@@ -142,44 +139,46 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
     // this is provider specific
     test("login on provider", async done => {
+        await page.waitForSelector('#IDToken1');
         await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
         await expect(page).toFill('#mat-input-1', 'V1bePayTester');
         await page.screenshot({ path: './screenshot/SFRlogin.png', fullPage: true });
         await expect(page).toClick('button', { text: 'Sign in' });
         console.log('vibefeature user is logged in');
-        await page.waitFor(6750);
+        
         done();
     });
 
     // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
     test("select account on provider", async done => {
+        await page.waitForSelector('#mat-radio-4');
         await expect(page).toClick('#mat-radio-4');
         await expect(page).toClick('button', { text: 'Allow' });
         console.log('account selected');
         await page.screenshot({ path: './screenshot/SAcctSelected.png', fullPage: true });
-        await page.waitFor(6750);
         done();
     });
 
     // this is provider specific
     test("redirect back to hosted payments processing page", async done => {
+        await page.waitFor(6750);
         let VBGurl = await page.url();
         await page.screenshot({ path: './screenshot/paymentAuth.png', fullPage: true });
         expect(VBGurl).toContain('success');
         console.log('VBG Thankyou success splash');
-        await page.waitFor(5000);
-        let Murl = await page.url();
-        expect(Murl).toContain('Payment');
-        await page.waitFor(6750);
         done();
     });
 
     // this is provider specific
-    test("redirect back to merchant", async done => {
-        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
-        //await expect(textContent).toContain('Payment Details');
-        await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
+    test("redirect back to merchant payment details", async done => {
         console.log('Merchant payment details page');
+        await page.waitFor(6750);
+        let Murl = await page.url();
+        expect(Murl).toContain('Payment');
+        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
+        await expect(textContent).toContain('Payment Details');
+        await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
+        await page.waitFor(24000);
         browser.close();
         done();
     });
@@ -192,15 +191,15 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
 
     // per payment
-    test("retry untill we get payment status completed", async done => {
+    test("retry until we get payment status completed", async done => {
+
+       const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 
         console.log('in retry bits');
-        const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
-
         await retry(
             async () => {
                 console.log('retrying');
-                return new Promise<string>((res, reg) => {
+                return new Promise<string>((res) => {
                     request
                         .get(getStatusLink, { headers: HeadersHelper.createBearer(accessToken) })
                         .on('response', (response) => ResponseHelper
@@ -216,6 +215,5 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
         done();
     });
-
 
 });

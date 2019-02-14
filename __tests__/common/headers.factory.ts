@@ -6,7 +6,7 @@ export class HeadersHelper {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Basic ${value}`
         }
-        console.log(headers);
+        // console.log(headers);
         return headers;
     }
 
@@ -16,7 +16,7 @@ export class HeadersHelper {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${value}`
         };
-        console.log(headers);
+        // console.log(headers);
         return headers;
     }
 }
