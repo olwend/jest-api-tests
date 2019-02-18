@@ -3,12 +3,17 @@ CONFIGURATION ITEMS
 ENVIRONMENTS 
 apiUrlRoot:
 LOCAL http://0.0.0.0:5006/
-DEV 'https://api.banking-gateway.dev.vibepay.com/
-TEST 'https://api.banking-gateway.test.vibepay.com/
+DEV 'https://dev.api.banking-gateway.jigpay.co.uk/'
+TEST 'https://test.api.banking-gateway.jigpay.co.uk'
 SANDBOX 'https://api.banking-gateway.sandbox.vibepay.com/
       
+CLIENTS:
+TEST ClientId = "test-merchant1-vibepay-api" -> 50
+LOCAL ClientId = "merchant1-vibepay-api", -> 25
+DEV ClientId = "dev-merchant1-vibepay-api" -> 25
 
-version endpoint https://dev.api.jigpay.co.uk/api/version
+
+version endpoint $apiUrlRoot/api/version
 
 ACCESS TOKEN: 
 /connect/token

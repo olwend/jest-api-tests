@@ -73,6 +73,8 @@ describe.each`
 
             console.log('Getting payment details .......')
             console.log('This is token ........' + accessToken);
+            console.log(amount, transactionId);
+            
 
             request
                 .post(`${apiUrlRoot}/api/v1.0/payments`,
@@ -99,7 +101,7 @@ describe.each`
         });
 
         // per payment
-        test("get payment status", async done => {
+        xtest("get payment status", async done => {
 
             const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 
@@ -118,7 +120,7 @@ describe.each`
                 }));
         });
 
-        test("progress to hosted payments page", async done => {
+        xtest("progress to hosted payments page", async done => {
 
             // set up globals for use in rest of tests
             browser = await puppeteer.launch({ headless: false });
@@ -133,7 +135,7 @@ describe.each`
         });
 
         // this is provider specific
-        test("navigate to provider", async done => {
+        xtest("navigate to provider", async done => {
             // TODO: provider 
             await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
             console.log('Moved through to Forge Rock')
@@ -145,7 +147,7 @@ describe.each`
 
 
         // this is provider specific
-        test("login on provider", async done => {
+        xtest("login on provider", async done => {
             await page.waitForSelector('#IDToken1');
             await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
             await expect(page).toFill('#mat-input-1', 'V1bePayTester');
@@ -157,7 +159,7 @@ describe.each`
         });
 
         // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
-        test("select account on provider", async done => {
+        xtest("select account on provider", async done => {
             await page.waitForSelector('#mat-radio-4');
             await expect(page).toClick('#mat-radio-4');
             await expect(page).toClick('button', { text: 'Allow' });
@@ -167,7 +169,7 @@ describe.each`
         });
 
         // this is provider specific
-        test("redirect back to hosted payments processing page", async done => {
+        xtest("redirect back to hosted payments processing page", async done => {
             await page.waitFor(6750);
             let VBGurl = await page.url();
             await page.screenshot({ path: './screenshot/paymentAuth.png', fullPage: true });
@@ -177,7 +179,7 @@ describe.each`
         });
 
         // this is provider specific
-        test("redirect back to merchant payment details", async done => {
+        xtest("redirect back to merchant payment details", async done => {
             console.log('Merchant payment details page');
             await page.waitFor(6750);
             let Murl = await page.url();
@@ -198,7 +200,7 @@ describe.each`
 
 
         // per payment
-        test("retry until we get payment status completed", async done => {
+        xtest("retry until we get payment status completed", async done => {
 
             const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 

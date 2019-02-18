@@ -24,8 +24,9 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     let paymentToken: string = '';
     let page: puppeteer.Page = undefined;
     let browser: puppeteer.Browser = undefined;
-
-    let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
+    let apiUrlRoot: string = 'https://dev.api.banking-gateway.jigpay.co.uk';
+    // let apiUrlRoot: string = 'https://test.api.banking-gateway.jigpay.co.uk';
+    // let apiUrlRoot: string = 'https://api.banking-gateway.sandbox.vibepay.com';
     let factory = new AuthCodeFactory('fake-merchant', 'secret');
     let creds = factory.create();
 
@@ -119,11 +120,11 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         page = await browser.newPage();
 
         await page.goto(paymentAuthorizationUri);
-        await page.waitFor(6750);
+        await page.waitForSelector('h1');
         let returl = await page.url()
         expect(returl).toMatch(paymentAuthorizationUri);
+        console.log('Reached VBG payment link dashboard');
         await page.screenshot({ path: './screenshot/SVBG.png', fullPage: true });
-
         done();
     });
 
@@ -133,7 +134,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
-        await page.waitFor(6750);
+        await page.waitForSelector('#IDToken1');
         let FRurl = await page.url();
         expect(FRurl).toContain('https://auth.ob.forgerock.financial');
         done();
@@ -142,12 +143,12 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
     // this is provider specific
     test("login on provider", async done => {
+        await page.waitForSelector('#IDToken1');
         await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
         await expect(page).toFill('#mat-input-1', 'V1bePayTester');
         await page.screenshot({ path: './screenshot/SFRlogin.png', fullPage: true });
         await expect(page).toClick('button', { text: 'Sign in' });
         console.log('vibefeature user is logged in');
-        await page.waitFor(6750);
         done();
     });
 
@@ -157,29 +158,29 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         await expect(page).toClick('button', { text: 'Allow' });
         console.log('account selected');
         await page.screenshot({ path: './screenshot/SAcctSelected.png', fullPage: true });
-        await page.waitFor(6750);
         done();
     });
 
     // this is provider specific
     test("redirect back to hosted payments processing page", async done => {
+        await page.waitFor(6750);
         let VBGurl = await page.url();
         await page.screenshot({ path: './screenshot/paymentAuth.png', fullPage: true });
         expect(VBGurl).toContain('success');
         console.log('VBG Thankyou success splash');
-        await page.waitFor(5000);
-        let Murl = await page.url();
-        expect(Murl).toContain('Payment');
-        await page.waitFor(6750);
         done();
     });
 
     // this is provider specific
-    test("redirect back to merchant", async done => {
-        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
-        //await expect(textContent).toContain('Payment Details');
-        await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
+    test("redirect back to merchant payment details", async done => {
         console.log('Merchant payment details page');
+        await page.waitFor(6750);
+        let Murl = await page.url();
+        expect(Murl).toContain('Payment');
+        let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
+        await expect(textContent).toContain('Payment Details');
+        await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
+        await page.waitFor(24500);
         browser.close();
         done();
     });
@@ -216,6 +217,5 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
         done();
     });
-
 
 });
