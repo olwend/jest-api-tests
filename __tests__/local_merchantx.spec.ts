@@ -6,7 +6,7 @@ import { ResponseHelper } from "./common/response-helper";
 import { HeadersHelper } from "./common/headers.factory";
 import { retry } from "ts-retry-promise"
 
-jest.setTimeout(60000);
+jest.setTimeout(70000);
 
 // helper/variables to switch environments
 
@@ -69,7 +69,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         console.log('Getting payment details .......')
         console.log('This is token ........' + accessToken);
 
-        request
+        console.log(request 
             .post(`${apiUrlRoot}/api/v1.0/payments`,
                 {
                     // create payment via data table
@@ -89,7 +89,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
                 expect(paymentAuthorizationUri).not.toBeUndefined();
                 console.log('Payment link ' + paymentAuthorizationUri);
                 done();
-            }));
+            })));
 
     });
 
@@ -116,7 +116,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     test("progress to hosted payments page", async done => {
 
         // set up globals for use in rest of tests
-        browser = await puppeteer.launch({ headless: false });
+        browser = await puppeteer.launch({ headless: true });
         page = await browser.newPage();
 
         await page.goto(paymentAuthorizationUri);
@@ -131,7 +131,6 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
     // this is provider specific
     test("navigate to provider", async done => {
         // TODO: provider 
-        console.log('Reached VBG payment link dashboard');
         await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
         console.log('Moved through to Forge Rock')
         await page.waitForSelector('#IDToken1');
@@ -154,6 +153,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
     // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
     test("select account on provider", async done => {
+        await page.waitForSelector('#mat-radio-4');
         await expect(page).toClick('#mat-radio-4');
         await expect(page).toClick('button', { text: 'Allow' });
         console.log('account selected');
@@ -180,7 +180,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
         await expect(textContent).toContain('Payment Details');
         await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
-        await page.waitFor(24500);
+        await page.waitFor(30500);
         browser.close();
         done();
     });
@@ -193,7 +193,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
 
 
     // per payment
-    test("retry untill we get payment status completed", async done => {
+    test("retry untill we get payment status Authorized", async done => {
 
         console.log('in retry bits');
         const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
@@ -213,7 +213,8 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
                             }));
                 });
             },
-            { until: (s) => s === 'Completed' });
+            { until:( (s) => s === 'Authorized' 
+                    || s === 'Completed' )});
 
         done();
     });

@@ -15,8 +15,14 @@ jest.setTimeout(70000);
 // add error handling
 
 let accessToken: string = '';
-let paymentAuthorizationUri: string = '';
-let paymentToken: string = '';
+let paymentAuthorizationUri1: string = '';
+let paymentToken1: string = '';
+let paymentAuthorizationUri2: string = '';
+let paymentToken2: string = '';
+let paymentAuthorizationUri3: string = '';
+let paymentToken3: string = '';
+let paymentAuthorizationUri4: string = '';
+let paymentToken4: string = '';
 let page: puppeteer.Page = undefined;
 let browser: puppeteer.Browser = undefined;
 let apiUrlRoot: string = 'https://dev.api.banking-gateway.jigpay.co.uk';
@@ -60,46 +66,189 @@ describe("Check version and get access token", () => {
     });
 });
 
-describe.each`
-        amount | transactionId | unstructured | reference
-        ${2700.00}|${11111111111111}|${4321}|${1414}
-        ${240.00} |${22222222222222}|${1234}|${2414}
-        ${300.00} |${33333333333333}|${3333}|${3414}
-        ${2700.00}|${44444444444444}|${4444}|${4414}
-            `
-    ('Processes payment $amount $transactionId $unstructured $reference', ({amount, transactionId, unstructured, reference}) =>  {
+// describe.each`
+//         amount | transactionId | unstructured | reference
+//         ${2700.00}|${11111111111111}|${4321}|${1414}
+//         ${240.00} |${22222222222222}|${1234}|${2414}
+//         ${300.00} |${33333333333333}|${3333}|${3414}
+//         ${170.00}|${44444444444444}|${4444}|${4414}`
+//     ('Processes payment $amount $transactionId $unstructured $reference', ({amount, transactionId, unstructured, reference}) =>  {
 
-        test("create payment and save paymentAuthorizationUri", async done => {
+        // test("create payment and save paymentAuthorizationUri", async done => {
 
-            console.log('Getting payment details .......')
-            console.log('This is token ........' + accessToken);
-            console.log(amount, transactionId);
+        //     console.log('Getting payment details .......')
+        //     console.log('This is token ........' + accessToken);
+        //     console.log(amount, transactionId);
             
+            
+        //     console.log(request
+        //         .post(`${apiUrlRoot}/api/v1.0/payments`,
+        //             {
+        //                 // create payment via data table
+        //                 body: JSON.stringify({
+        //                     "amount": amount,
+        //                     "transactionId": transactionId,
+        //                     "unstructured": unstructured,
+        //                     "reference": reference
+        //                 }),
+        //                 // generate headers
+        //                 headers: HeadersHelper.createBearer(accessToken),
+        //             })
+         
+        //         .on('response', (response) => ResponseHelper.handleResponse(response).then(data => {
+        //             const dt = JSON.parse(data);
+        //             paymentToken = dt.data.paymentToken;
+        //             paymentAuthorizationUri = dt.data.paymentAuthorizationUri;
+        //             expect(paymentAuthorizationUri).not.toBeUndefined();
+        //             console.log('Payment link ' + paymentAuthorizationUri);
+        //             done();
+        //         })));
 
+        test("create payments and save paymentAuthorizationUris", async done => {
+            // let paymentAuthorizationUri = '';
+            const authHeader = `Bearer ${accessToken}`;
+            console.log('This is Auth Header ........' + authHeader);
+            console.log('Getting payment details .......');
+            console.log(amount, transactionId,unstructured, reference )
             request
                 .post(`${apiUrlRoot}/api/v1.0/payments`,
                     {
-                        // create payment via data table
                         body: JSON.stringify({
-                            amount: amount,
-                            transactionId: transactionId,
-                            unstructured: unstructured,
-                            reference: reference
-                        }),
-                        // generate headers
-                        headers: HeadersHelper.createBearer(accessToken),
+                            "amount": "2700.00",
+                            "transactionId": "12000000000002",
+                            "unstructured": "4321",
+                            "reference": "3414"
+                            }),
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': authHeader
+                        },
                     })
-                .on('response', (response) => ResponseHelper.handleResponse(response).then(data => {
-                    const dt = JSON.parse(data);
-                    paymentToken = dt.data.paymentToken;
-                    paymentAuthorizationUri = dt.data.paymentAuthorizationUri;
-                    expect(paymentAuthorizationUri).not.toBeUndefined();
-                    console.log('Payment link ' + paymentAuthorizationUri);
-                    done();
-                }));
+                .on('response', (response) => {
+                    expect(response.statusCode).toBe(200);
+                    let data: any = '';
+                    response.on('data', _data => (data += _data));
+                    response.on('end', () => {
+                        console.log(data)
+                        let dt = JSON.parse(data);
+                        paymentToken1 = dt.data.paymentToken;
+                        paymentAuthorizationUri1 = dt.data.paymentAuthorizationUri;
+                        expect(paymentAuthorizationUri1).not.toBeUndefined();
+                        console.log('Payment link ' + paymentAuthorizationUri1);
+                        done();
+                    });
+    
+                });
+                // ${240.00} |${22222222222222}|${1234}|${2414}
+                request
+                .post(`${apiUrlRoot}/api/v1.0/payments`,
+                    {
+                        body: JSON.stringify({
+                            "amount": "240.00",
+                            "transactionId": "22222222222222",
+                            "unstructured": "1234",
+                            "reference": "2414"
+                            }),
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': authHeader
+                        },
+                    })
+                .on('response', (response) => {
+                    expect(response.statusCode).toBe(200);
+                    let data: any = '';
+                    response.on('data', _data => (data += _data));
+                    response.on('end', () => {
+                        console.log(data)
+                        let dt = JSON.parse(data);
+                        paymentToken2 = dt.data.paymentToken;
+                        paymentAuthorizationUri2 = dt.data.paymentAuthorizationUri;
+                        expect(paymentAuthorizationUri2).not.toBeUndefined();
+                        console.log('Payment link ' + paymentAuthorizationUri2);
+                        done();
+                    });
+    
+                });
+
+                // ${300.00} |${33333333333333}|${3333}|${3414}
+                request
+                .post(`${apiUrlRoot}/api/v1.0/payments`,
+                    {
+                        body: JSON.stringify({
+                            "amount": "300.00",
+                            "transactionId": "33333333333333",
+                            "unstructured": "3333",
+                            "reference": "3414"
+                            }),
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': authHeader
+                        },
+                    })
+                .on('response', (response) => {
+                    expect(response.statusCode).toBe(200);
+                    let data: any = '';
+                    response.on('data', _data => (data += _data));
+                    response.on('end', () => {
+                        console.log(data)
+                        let dt = JSON.parse(data);
+                        paymentToken2 = dt.data.paymentToken;
+                        paymentAuthorizationUri2 = dt.data.paymentAuthorizationUri;
+                        expect(paymentAuthorizationUri2).not.toBeUndefined();
+                        console.log('Payment link ' + paymentAuthorizationUri2);
+                        done();
+                    });
+    
+                });
+
+                // ${170.00}|${44444444444444}|${4444}|${4414}
+                request
+                .post(`${apiUrlRoot}/api/v1.0/payments`,
+                    {
+                        body: JSON.stringify({
+                            "amount": "170.00",
+                            "transactionId": "44444444444444",
+                            "unstructured": "4444",
+                            "reference": "4414"
+                            }),
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': authHeader
+                        },
+                    })
+                .on('response', (response) => {
+                    expect(response.statusCode).toBe(200);
+                    let data: any = '';
+                    response.on('data', _data => (data += _data));
+                    response.on('end', () => {
+                        console.log(data)
+                        let dt = JSON.parse(data);
+                        paymentToken2 = dt.data.paymentToken;
+                        paymentAuthorizationUri2 = dt.data.paymentAuthorizationUri;
+                        expect(paymentAuthorizationUri2).not.toBeUndefined();
+                        console.log('Payment link ' + paymentAuthorizationUri2);
+                        done();
+                    });
+    
+                });
 
         });
 
+        
+        xdescribe.each`
+        paymentToken | paymentAuthorizationUri
+        ${paymentToken1}|${paymentAuthorizationUri1}
+        ${paymentToken2}|${paymentAuthorizationUri2}
+        ${paymentToken3}|${paymentAuthorizationUri3}
+        ${paymentToken4}|${paymentAuthorizationUri4}`
+    ('Processes payment $paymentToken $paymentAuthorizationUri', ({paymentToken, paymentAuthorizationUri}) =>  {
+        
+        
+        
         // per payment
         xtest("get payment status", async done => {
 
@@ -200,7 +349,7 @@ describe.each`
 
 
         // per payment
-        xtest("retry until we get payment status completed", async done => {
+        xtest("retry until we get payment status Authorized or Completed", async done => {
 
             const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 
@@ -220,7 +369,8 @@ describe.each`
                                 }));
                     });
                 },
-                { until: (s) => s === 'Completed' });
+                { until:( (s) => s === 'Authorized' 
+                    || s === 'Completed' )});
 
             done();
         });

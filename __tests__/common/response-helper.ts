@@ -5,7 +5,7 @@ export class ResponseHelper {
 
     static handleResponse(response: request.Response): Promise<string> {
         expect(response.statusCode).toBe(200);
-        // console.log(response.statusCode);
+        console.log(response.statusCode);
 
         let data = '';
         return new Promise((resolve, reject) => {
