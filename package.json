@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.18",
+    "jest-html-reporters": "^1.1.1",
     "ts-jest": "^23.10.5"
   }
 }

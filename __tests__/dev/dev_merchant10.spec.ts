@@ -192,7 +192,7 @@ describe("Test of the dev merchant10-vibepay-api to payment Authorized", () => {
 
 
         // per payment
-        test("retry until we get payment status Authorized or Completed", async done => {
+        test("retry until we get payment status minimum AuthorizationStarted", async done => {
 
             const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 
@@ -212,8 +212,9 @@ describe("Test of the dev merchant10-vibepay-api to payment Authorized", () => {
                                 }));
                     });
                 },
-                { until:( (s) => s === 'Authorized' 
-                    || s === 'Completed' )});
+                { until:( (s)=> s === 'Authorized' 
+                    || s === 'Completed'
+                    || s === 'AuthorizationStarted'  )});
 
             done();
         });

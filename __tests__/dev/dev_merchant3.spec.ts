@@ -159,8 +159,6 @@ describe("Test of the dev merchant3-vibepay-api to payment Authorized", () => {
         test("redirect back to hosted payments processing page", async done => {
             await page.waitFor(6750);
             let VBGurl = await page.url();
-            // await page.screenshot({ path: './screenshot/paymentAuth.png', fullPage: true });
-            // expect(VBGurl).toContain('success');
             console.log('VBG Thankyou success splash');
             done();
         });
@@ -170,10 +168,6 @@ describe("Test of the dev merchant3-vibepay-api to payment Authorized", () => {
             console.log('Merchant payment details page');
             await page.waitFor(6750);
             let Murl = await page.url();
-            // expect(Murl).toContain('Payment');
-            // let textContent = await page.evaluate(() => document.querySelector('h1').textContent);
-            // await expect(textContent).toContain('Payment Details');
-            // await page.screenshot({ path: './screenshot/SPaymentDetails.png', fullPage: true });
             await page.waitFor(30500);
             browser.close();
             done();
@@ -187,7 +181,7 @@ describe("Test of the dev merchant3-vibepay-api to payment Authorized", () => {
 
 
         // per payment
-        test("retry until we get payment status Authorized or Completed", async done => {
+        test("retry until we get payment status minimum AuthorizationStarted", async done => {
 
             const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 
@@ -209,7 +203,8 @@ describe("Test of the dev merchant3-vibepay-api to payment Authorized", () => {
                     });
                 },
                 { until:( (s) => s === 'Authorized' 
-                    || s === 'Completed' )
+                    || s === 'Completed'
+                    || s === 'AuthorizationStarted'  )
             });
                 
             done();
