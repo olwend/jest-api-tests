@@ -23,11 +23,27 @@ Browser events are coded via the Puppeteer API
 Asserts are via expect giving access to Jest matchers
 
 * Running tests
-npm t or jest will run all tests in the __tests__ directory jest string will run all tests with names matching the regex /string/ (e.g. stringtest.js or teststring.js) jest string.js will run only string.js
+npm t or jest will run all tests in the __tests__ directory jest string will run all tests with names matching the regex /string/ (e.g. stringtest.js or teststring.js) 
 
-Standard output of test run is to console window. The full test-report.html is in the root directory.
+npm t string or jest string will run only string (and other files with string in names)
+
+Standard output of test run is to console window. The full jest_html_reporters.html is in the root directory.
+These can be run as background processes by ‘$jest dev_merchant & jest perf_merchant & jest local_merchantx’
+Tests are excluded from running by prefixing dep_
 
 * Debugging
 To view the tests in progress uncomment settings in ./jest_config/setup.js
 headless: false,
 slowMo: 1000,
+
+* Test structure
+The tests are named by env_merchant-name.spec.js and sit in folders /local, /dev
+These merchant clients are configured for payments in each environment.
+
+*To do
+Complete 'fake bank' to mock forge rock.
+Log into Kubectl and monitor resource and in higher environments.
+
+* Document what to change / configure for other provider banks and requisite bank accounts.
+
+* Explain progress on multiple payments per 'connection'
