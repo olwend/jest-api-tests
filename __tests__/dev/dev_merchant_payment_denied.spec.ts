@@ -109,7 +109,7 @@ describe("Test of the dev merchant1-vibepay-api to show failed payment", () => {
 
     test("progress to hosted payments page", async done => {
         // set up globals for use in rest of tests
-        browser = await puppeteer.launch({ headless: true });
+        browser = await puppeteer.launch({ headless: false });
         page = await browser.newPage();
         await page.goto(paymentAuthorizationUri);
         await page.waitForSelector('h1');
@@ -144,13 +144,15 @@ describe("Test of the dev merchant1-vibepay-api to show failed payment", () => {
     });
 
     // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
-    test("select account on provider", async done => {
+    test("do not select account on provider", async done => {
         await page.waitForSelector('#mat-radio-4');
-        await expect(page).toClick('#mat-radio-4');
+        // await expect(page).toClick('#mat-radio-4');
+        // await page.waitForSelector('body > app-root > forgerock-customization-sidenav > mat-sidenav-container > mat-sidenav-content > app-simple > app-consent > app-consent-dynamic > app-consent-single-payment > mat-card > div:nth-child(5) > button > span');
+        await expect(page).toClick('body > app-root > forgerock-customization-sidenav > mat-sidenav-container > mat-sidenav-content > app-simple > app-consent > app-consent-dynamic > app-consent-single-payment > mat-card > div:nth-child(5) > button > span');;
         // await expect(page).toClick('button', { text: 'Allow' });
         // how to get out of bank and back to rejected screen
         console.log('account not selected');
-        await page.screenshot({ path: './screenshot/SAcctSelected.png', fullPage: true });
+        await page.screenshot({ path: './screenshot/SAcctnotSelected.png', fullPage: true });
         done();
     });
 
@@ -158,17 +160,19 @@ describe("Test of the dev merchant1-vibepay-api to show failed payment", () => {
     test("redirect back to hosted payments processing page", async done => {
         await page.waitFor(6750);
         let VBGurl = await page.url();
-        console.log('VBG Thankyou success splash');
+        expect(VBGurl).toContain('error=access_denied');
+        console.log('VBG freezes on splash');
         done();
     });
 
     // this is provider specific
-    test("redirect back to merchant payment details", async done => {
+    test("redirect back to defined destination e.g. merchant payment page", async done => {
         
         await page.waitFor(6750);
         let Murl = await page.url();
-        console.log('Merchant payment details page '+ Murl);
-        await page.waitFor(34500);
+        console.log('Should go back to a Merchant payment page '+ Murl);
+        // expect(Murl).toContain('identifiable part of Murl');
+        // await page.waitFor(34500);
         browser.close();
         done();
     });
@@ -181,7 +185,7 @@ describe("Test of the dev merchant1-vibepay-api to show failed payment", () => {
 
 
     // per payment
-    test("retry until we get payment status minimum AuthorizationStarted", async done => {
+    test("retry until we get payment status minimum AuthorizationStarted - should there be a status Denied?", async done => {
 
         const getStatusLink = `${apiUrlRoot}/api/v1.0/payments/${paymentToken}`;
 

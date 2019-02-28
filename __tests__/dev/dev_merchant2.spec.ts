@@ -110,7 +110,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
         test("progress to hosted payments page", async done => {
 
             // set up globals for use in rest of tests
-            browser = await puppeteer.launch({ headless: true });
+            browser = await puppeteer.launch({ headless: false });
             page = await browser.newPage();
             await page.goto(paymentAuthorizationUri);
             await page.waitForSelector('h1');
