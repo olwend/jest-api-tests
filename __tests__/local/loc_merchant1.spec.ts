@@ -52,7 +52,6 @@ describe("Check version and get access token", () => {
                     expect(accessToken).not.toBeNull();
                     done();
                 }));
-        // pull out data & save access token
     });
 });
 
@@ -110,7 +109,7 @@ describe("Test of the local merchant1-vibepay-api to payment Authorized", () => 
         test("progress to hosted payments page", async done => {
 
             // set up globals for use in rest of tests
-            browser = await puppeteer.launch({ headless: false });
+            browser = await puppeteer.launch({ headless: true });
             page = await browser.newPage();
             await page.goto(paymentAuthorizationUri);
             await page.waitForSelector('h1');

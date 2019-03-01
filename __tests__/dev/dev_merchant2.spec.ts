@@ -110,7 +110,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
         test("progress to hosted payments page", async done => {
 
             // set up globals for use in rest of tests
-            browser = await puppeteer.launch({ headless: false });
+            browser = await puppeteer.launch({ headless: true });
             page = await browser.newPage();
             await page.goto(paymentAuthorizationUri);
             await page.waitForSelector('h1');
@@ -121,7 +121,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
             done();
         });
 
-        // this is provider specific
+        // this is provider specific - change line 127 to click into provider site
         test("navigate to provider", async done => {
             // TODO: provider 
             await page.click('body > app-root > div > main > app-payment > section.providers > div > app-provider:nth-child(1) > img');
@@ -133,7 +133,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
         });
 
 
-        // this is provider specific
+        // this is provider specific - change according to provider UI
         test("login on provider", async done => {
             await page.waitForSelector('#IDToken1');
             await expect(page).toFill('#IDToken1', 'vibefeature4@gmail.com');
@@ -145,7 +145,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
             done();
         });
 
-        // this is provider specific await expect(page).toClick('#mat-radio-3') for EUR;
+        // this is provider specific vary for different ccy e.g. FG await expect(page).toClick('#mat-radio-3') for EUR;
         test("select account on provider", async done => {
             await page.waitForSelector('#mat-radio-4');
             await expect(page).toClick('#mat-radio-4');
@@ -155,7 +155,6 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
             done();
         });
 
-        // this is provider specific
         test("redirect back to hosted payments processing page", async done => {
             await page.waitFor(6750);
             let VBGurl = await page.url();
@@ -165,7 +164,7 @@ describe("Test of the dev merchant2-vibepay-api to payment Authorized", () => {
             done();
         });
 
-        // this is provider specific
+        // this is merchant specific according to configuration of e.g. dev-merchant2-vibepay-api
         test("redirect back to merchant payment details", async done => {
             console.log('Merchant payment details page');
             await page.waitFor(6750);

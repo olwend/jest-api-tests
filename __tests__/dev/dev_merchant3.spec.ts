@@ -173,13 +173,6 @@ describe("Test of the dev merchant3-vibepay-api to payment Authorized", () => {
             done();
         });
 
-        //         process.on('unhandledRejection', (reason, promise) => {
-        //             console.log('Unhandled Rejection at:', reason.stack || reason)
-        //             // Recommended: send the information to sentry.io
-        //             // or whatever crash reporting service you use
-        //         })
-
-
         // per payment
         test("retry until we get payment status minimum AuthorizationStarted", async done => {
 

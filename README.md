@@ -28,8 +28,9 @@ npm t or jest will run all tests in the __tests__ directory jest string will run
 npm t string or jest string will run only string (and other files with string in names)
 
 Standard output of test run is to console window. The full jest_html_reporters.html is in the root directory.
-These can be run as background processes by ‘$jest dev_merchant & jest perf_merchant & jest local_merchantx’
-Tests are excluded from running by prefixing dep_
+These can be run to ramp up volume as background processes by
+ ‘$jest dev_merchant & jest perf_merchant & jest local_merchantx’
+Tests are excluded from running by prefixing dep_  (good idea to exclude local when running tests on dev or test)
 
 * Debugging
 To view the tests in progress uncomment settings in ./jest_config/setup.js
@@ -40,10 +41,15 @@ slowMo: 1000,
 The tests are named by env_merchant-name.spec.js and sit in folders /local, /dev
 These merchant clients are configured for payments in each environment.
 
+N.B. perf_ tests are without the 'expect' statements on UI elements, which are functional test assertions.
+The performance tests rely on payment status as sole assertion. 
+
 *To do
 Complete 'fake bank' to mock forge rock.
 Log into Kubectl and monitor resource and in higher environments.
 
-* Document what to change / configure for other provider banks and requisite bank accounts.
+* Ascertain what output will be required to gain confidence of sandbox providers
+This test can be used for low volume payment throughput to qualify with new banks if they require conformance. 
 
-* Explain progress on multiple payments per 'connection'
+* Establish multiple payments per 'connection' e.g. use jest-each as per set up 
+See 'dep_generic_merchant_each_spike.spec'
